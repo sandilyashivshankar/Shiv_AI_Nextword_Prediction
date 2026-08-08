@@ -2,6 +2,7 @@ import streamlit as st
 import tensorflow as tf
 import numpy as np
 import pickle
+import os
 
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 
@@ -32,7 +33,6 @@ html, body, [class*="css"]{
     color:white;
 }
 
-/* Hide Streamlit Footer */
 footer{
 visibility:hidden;
 }
@@ -41,150 +41,100 @@ header{
 visibility:hidden;
 }
 
-/* Sidebar */
-
 section[data-testid="stSidebar"]{
 background:#111827;
 }
 
-/* Glass Card */
-
 .glass{
-
 background:rgba(255,255,255,.06);
-
 backdrop-filter:blur(15px);
-
 padding:25px;
-
 border-radius:20px;
-
 border:1px solid rgba(255,255,255,.15);
-
 box-shadow:0 10px 40px rgba(0,0,0,.3);
-
 }
 
-/* Button */
-
 div.stButton > button{
-
 background:linear-gradient(90deg,#7c3aed,#2563eb);
-
 color:white;
-
 font-size:18px;
-
 font-weight:600;
-
 border:none;
-
 padding:12px 25px;
-
 border-radius:12px;
-
 transition:.3s;
-
 width:100%;
 }
 
 div.stButton > button:hover{
-
 transform:scale(1.03);
-
 background:linear-gradient(90deg,#9333ea,#3b82f6);
-
 }
-
-/* Text Area */
 
 textarea{
-
 font-size:18px !important;
-
 border-radius:12px !important;
-
 }
 
-/* Result Card */
-
 .result{
-
 background:#1E293B;
-
 padding:25px;
-
 border-radius:20px;
-
 border-left:6px solid #7C3AED;
-
 margin-top:20px;
-
 text-align:center;
-
 }
 
 .big{
-
 font-size:35px;
-
 font-weight:bold;
-
 color:#60A5FA;
-
 }
 
 .small{
-
 font-size:18px;
-
 color:#CBD5E1;
-
 }
 
 .title{
-
 text-align:center;
-
 font-size:45px;
-
 font-weight:700;
-
 margin-bottom:0px;
-
 }
 
 .subtitle{
-
 text-align:center;
-
 font-size:18px;
-
 color:#94A3B8;
-
 margin-bottom:30px;
-
 }
 
 </style>
 """, unsafe_allow_html=True)
 
 # -----------------------------
-# Load Model
+# Load Model and Assets
 # -----------------------------
+# Build paths relative to this app.py file so Streamlit Cloud
+# can correctly find files stored in the NextWord_Prediction folder.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "lstm_model (1).h5")
+TOKENIZER_PATH = os.path.join(BASE_DIR, "tokenizer.pkl")
+MAXLEN_PATH = os.path.join(BASE_DIR, "max_len.pkl")
 
 @st.cache_resource
 def load_model():
-    return tf.keras.models.load_model("lstm_model (1).h5")
+    return tf.keras.models.load_model(MODEL_PATH)
 
 @st.cache_resource
 def load_tokenizer():
-    with open("tokenizer.pkl","rb") as f:
+    with open(TOKENIZER_PATH, "rb") as f:
         return pickle.load(f)
 
 @st.cache_resource
 def load_maxlen():
-    with open("max_len.pkl","rb") as f:
+    with open(MAXLEN_PATH, "rb") as f:
         return pickle.load(f)
 
 model = load_model()
@@ -194,7 +144,6 @@ max_len = load_maxlen()
 # -----------------------------
 # Prediction Function
 # -----------------------------
-
 def predict_next_word(text):
 
     token_list = tokenizer.texts_to_sequences([text])[0]
@@ -220,7 +169,6 @@ def predict_next_word(text):
 # -----------------------------
 # Sidebar
 # -----------------------------
-
 with st.sidebar:
 
     st.title("🤖 AI Model")
@@ -254,9 +202,7 @@ using
 # -----------------------------
 # Main UI
 # -----------------------------
-
 st.markdown("<div class='title'>Shiv 🤖 AI Next Word Predictor</div>",unsafe_allow_html=True)
-
 st.markdown("<div class='subtitle'>Deep Learning Powered by TensorFlow & LSTM</div>",unsafe_allow_html=True)
 
 col1,col2=st.columns([2,1])
@@ -296,7 +242,6 @@ with col2:
 # -----------------------------
 # Prediction
 # -----------------------------
-
 if predict:
 
     if text.strip()=="":
@@ -310,21 +255,15 @@ if predict:
             word = predict_next_word(text)
 
         st.markdown(f"""
-
         <div class="result">
-
         <div class="small">✨ Suggested Next Word</div>
-
         <div class="big">{word}</div>
-
         </div>
-
         """,unsafe_allow_html=True)
 
 # -----------------------------
 # Tabs
 # -----------------------------
-
 tab1,tab2,tab3 = st.tabs(
     [
         "💡 Examples",
@@ -376,7 +315,6 @@ Suitable for demonstrating **Natural Language Processing (NLP)** and **Deep Lear
 # -----------------------------
 # Footer
 # -----------------------------
-
 st.markdown("---")
 
 st.markdown(
